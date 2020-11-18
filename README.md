@@ -1,1 +1,1 @@
-# FundCS
+# FundCS Group 6 - Cryptography
