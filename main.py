@@ -5,8 +5,13 @@ from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import padding
 
+pri_key = ''
+pub_key = ''
+
 #generate keys for asymmetric method
 def asym_key_gen():
+    global pri_key
+    global pub_key
     #generate private and public key
     private_key = rsa.generate_private_key(
         public_exponent=65537,
@@ -23,6 +28,8 @@ def asym_key_gen():
     )
     with open('private_key.pem', 'wb') as f:
         f.write(pem)
+    pri_key = 'private_key.pem'
+
 
     #store public key in a file
     pem = public_key.public_bytes(
@@ -31,11 +38,13 @@ def asym_key_gen():
     )
     with open('public_key.pem', 'wb') as f:
         f.write(pem)
+    pub_key = 'public_key.pem'
 
 #asymmetric encryption function
 def asym_key_enc(filename):
+    global pub_key
     #read public key for encryption
-    with open("public_key.pem", "rb") as key_file:
+    with open(pub_key, "rb") as key_file:
         public_key = serialization.load_pem_public_key(
             key_file.read(),
             backend=default_backend()
@@ -62,11 +71,12 @@ def asym_key_enc(filename):
 
 #asymmetric decryption function
 def asym_key_dec(filename):
+    global pri_key
     #read encrypted file and decrypt contents
     f = open(filename, 'rb')
     encrypted = f.read()
     f.close()
-    with open("private_key.pem", "rb") as key_file:
+    with open(pri_key, "rb") as key_file:
         private_key = serialization.load_pem_private_key(
             key_file.read(),
             password=None,
@@ -90,62 +100,69 @@ def asym_key_dec(filename):
 
 
 
-
-done = False
-while done == False:
-    print("Hello, welcome to the Cryptographer!")
-    print("""Type in the number of one of the following options:
-            1. Encrypt a text file.
-            2. Decrypt a text file.
-            3. Close the program.""")
-    choice = input("Enter number: ")
-    if choice != None:
-        if choice == "1":
-            print("You have chosen to encrypt a text file. Please submit you text file by typing in the name of the file.\nFor example: 'myfile.txt'. Make sure your text file has the .txt extension and is placed in the same folder as this program.")
-            filename = input("Enter filename: ")
-            if filename != None:
-                #method = randint(0, 1)
-                method = 1
-                if method == "0":
-                    print("""Do you want to generate a new key or use an existing one? Answer 'yes' if you would like to generate a new key.""")
-                    key = input()
-                    if key == "yes":
-                        print("A new key will be generated")
-                        sym_key_gen()
+def main():
+    global pri_key
+    global pub_key
+    done = False
+    while done == False:
+        print("Hello, welcome to the Cryptographer!")
+        print("""Type in the number of one of the following options:
+                1. Encrypt a text file.
+                2. Decrypt a text file.
+                3. Close the program.""")
+        choice = input("Enter number: ")
+        if choice != None:
+            if choice == "1":
+                print("You have chosen to encrypt a text file. Please submit you text file by typing in the name of the file.\nFor example: 'myfile.txt'. Make sure your text file has the .txt extension and is placed in the same folder as this program.")
+                filename = input("Enter filename: ")
+                if filename != None:
+                    #method = randint(0, 1)
+                    method = 1
+                    if method == "0":
+                        print("""Do you want to generate a new key or use an existing one? Answer 'yes' if you would like to generate a new key.""")
+                        key = input()
+                        if key == "yes":
+                            print("A new key will be generated")
+                            #sym_key_gen()
+                        else:
+                            print("Existing key will be used. Make sure all key files are in the same folder as this program.")
+                        print("This function has not been added yet. Try something else please.")
+                        #sym_key_enc(filename)
                     else:
-                        print("Existing key will be used. Make sure all key files are in the same folder as this program.")
-                    #symmetric method is implemented here
-                    sym_key_enc(filename)
+                        print("""Do you want to generate a new key or use an existing one? Answer 'yes' if you would like to generate a new key. If you already have a key, make sure it is in the PEM format. Otherwise, the key won't work.""")
+                        key = input()
+                        if key == "yes":
+                            print("A new key will be generated.")
+                            asym_key_gen()
+                        else:
+                            print("What is the name of the private key? Include the .pem in the name.")
+                            pri_key = input("Enter private key name (including .pem): ")
+                            print("What is the name of the public key? Include the .pem in the name.")
+                            pub_key = input("Enter public key name (including .pem): ")
+                            print("Existing key will be used. Make sure all key files are in the same folder as this program.")
+                        asym_key_enc(filename)
                 else:
-                    print("""Do you want to generate a new key or use an existing one? Answer 'yes' if you would like to generate a new key.""")
-                    key = input()
-                    if key == "yes":
-                        print("A new key will be generated.")
-                        asym_key_gen()
+                    print("The filename you have submitted is incorrect or the file itself is not in the folder. Make sure you have typed the name correctly")
+                    break
+            elif choice == "2":
+                print("You have chosen to decrypt a text file. Please submit you text file by typing in the name of the file.\nFor example: 'myfile.txt'. Make sure your text file has the .txt extension and is placed in the same folder as this program.")
+                filename = input("Enter filename: ")
+                if filename != None:
+                    #method = randint(0, 1)
+                    method = 1
+                    if method == "0":
+                        print("This function has not been added yet. Try something else please.")
+                        #sym_key_dec(filename)
                     else:
-                        print("Existing key will be used. Make sure all key files are in the same folder as this program.")
-                    asym_key_enc(filename)
-            else:
-                break
-        elif choice == "2":
-            print("You have chosen to decrypt a text file. Please submit you text file by typing in the name of the file.\nFor example: 'myfile.txt'. Make sure your text file has the .txt extension and is placed in the same folder as this program.")
-            filename = input("Enter filename: ")
-            if filename != None:
-                #method = randint(0, 1)
-                method = 1
-                if method == "0":
-                    #symmetric method is implemented here
-                    sym_key_dec(filename)
+                        asym_key_dec(filename)
                 else:
-                    asym_key_dec(filename)
+                    break
+            elif choice == "3":
+                print("Thank you for using the Cryptographer. Until next time!")
+                done = True
             else:
-                break
-        elif choice == "3":
-            print("Thank you for using the Cryptographer. Until next time!")
-            done = True
+                print("Wrong input. Please choose between numbers 1 to 3.")
         else:
-            print("Wrong input. Please choose between numbers 1 to 3.")
-    else:
-        print("You haven't typed in anything! Please try again.")
+            print("You haven't typed in anything! Please try again.")
 
-
+main()
