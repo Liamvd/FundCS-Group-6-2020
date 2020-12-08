@@ -33,6 +33,8 @@ def asym_key_gen():
     with open('public_key.pem', 'wb') as f:
         f.write(pem)
 
+    print("Your keys are stored in the files 'private_key.pem' and 'public_key.pem'. Make sure to keep these files safe and don't share them with others except for those that need to encrypt your file.")
+
 #asymmetric encryption function
 def asym_key_enc(filename, public):
     pub_key = public
